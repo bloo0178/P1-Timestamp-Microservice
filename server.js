@@ -24,45 +24,47 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-
-app.get('/test', function(req,res) {
-  res.json({test: 'hello!!'});
-});
+/* Used to test values for acceptable format to parse into a Date object */
+let dateTest = function(d) {
+  if (Object.prototype.toString.call(d) === "[object Date]") {
+    // it is a date
+    if (isNaN(d.getTime())) {
+      // d.valueOf() could also work
+      return false; // date is not valid
+    } else {
+      return true; // date is valid
+    }
+  } else {
+    return false; // not a date
+  }
+};
 
 /* 
 Notes: The question mark in the path signifies an optional parameter "date_string". This
 allows for an endpoint that MAY have a value or not. 
 */
+
 app.get('/api/timestamp/:date_string?', function(req,res) {
+  
+  //Check to see if no date was specified
   if (req.params.date_string == null) {
-    res.json({test: 'null'});
+    res.json({date: new Date()}); //Date.now()?
   } 
-  let date_string = req.params.date_string; 
-  if (new Date(date_string) instanceof Date) {
-    res.json({test: 'valid'})
-  } else {
-    res.json({test: 'invalid'});
+  
+  //Format date_string in URI into variable based on integer or date format
+  if (isNaN(req.params.date_string)) { 
+    var date_string = new Date(req.params.date_string);
+    } else {
+  var date_string = new Date(parseInt(req.params.date_string) * 1000);
+    };
+  
+  // Test whether format in URI is valid or not
+  if (dateTest(date_string)) { //valid
+    res.json({unix: date_string.getTime(), utc : date_string.toUTCString()});
+  } else { //invalid
+    res.json({error : "Invalid Date"});
   }
 });
-
-
-/*
-console.clear();
-
-//let date_string = "2015-12-25";
-let date_string = "abcd"; // returns invalid date on toUTCString
-let date_string2 = 1479663089000;
-let test = new Date(date_string);
-let test2 = new Date(date_string2);
-console.log(new Date(date_string).getMonth());
-console.log(test instanceof Date); //returns true or false
-console.log((new Date(date_string)) instanceof Date);
-console.log(Date.parse(date_string) instanceof Date);
-console.log(test.toUTCString());
-console.log(test2.toUTCString());
-console.log(test2.getTime());
-*/
-
 
 
 // listen for requests :)
