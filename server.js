@@ -24,12 +24,12 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-/* Used to test values for acceptable format to parse into a Date object */
+/* Function used to test values for acceptable format to parse into a Date object.
+This is a required condition specified in the user stories. */
 let dateTest = function(d) {
   if (Object.prototype.toString.call(d) === "[object Date]") {
     // it is a date
     if (isNaN(d.getTime())) {
-      // d.valueOf() could also work
       return false; // date is not valid
     } else {
       return true; // date is valid
@@ -46,19 +46,22 @@ allows for an endpoint that MAY have a value or not.
 
 app.get('/api/timestamp/:date_string?', function(req,res) {
   
-  //Check to see if no date was specified
+  /*Check to see if URI is absent of a date_string, in which return a current timestamp*/
   if (req.params.date_string == null) {
-    res.json({date: new Date()}); //Date.now()?
+    res.json({date: new Date()}); 
   } 
   
-  //Format date_string in URI into variable based on integer or date format
+  /*Format date_string in URI into new date_string variable based on whether 
+  it represents an integer (UNIX timestamp) or ISO-8601 date string*/
   if (isNaN(req.params.date_string)) { 
     var date_string = new Date(req.params.date_string);
     } else {
-  var date_string = new Date(parseInt(req.params.date_string) * 1000);
+      /*Multiply by 1000 to represent milliseconds*/
+      var date_string = new Date(parseInt(req.params.date_string) * 1000);
     };
   
-  // Test whether format in URI is valid or not
+  /*Test whether the date_string is valid (URI value can successfully be
+  parsed by new Date(date_string)*/
   if (dateTest(date_string)) { //valid
     res.json({unix: date_string.getTime(), utc : date_string.toUTCString()});
   } else { //invalid
