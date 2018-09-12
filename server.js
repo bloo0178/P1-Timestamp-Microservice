@@ -25,8 +25,49 @@ app.get("/api/hello", function (req, res) {
 });
 
 
+app.get('/test', function(req,res) {
+  res.json({test: 'hello!!'});
+});
+
+/* 
+Notes: The question mark in the path signifies an optional parameter "date_string". This
+allows for an endpoint that MAY have a value or not. 
+*/
+app.get('/api/timestamp/:date_string?', function(req,res) {
+  if (req.params.date_string == null) {
+    res.json({test: 'null'});
+  } 
+  let date_string = req.params.date_string; 
+  if (new Date(date_string) instanceof Date) {
+    res.json({test: 'valid'})
+  } else {
+    res.json({test: 'invalid'});
+  }
+});
+
+
+/*
+console.clear();
+
+//let date_string = "2015-12-25";
+let date_string = "abcd"; // returns invalid date on toUTCString
+let date_string2 = 1479663089000;
+let test = new Date(date_string);
+let test2 = new Date(date_string2);
+console.log(new Date(date_string).getMonth());
+console.log(test instanceof Date); //returns true or false
+console.log((new Date(date_string)) instanceof Date);
+console.log(Date.parse(date_string) instanceof Date);
+console.log(test.toUTCString());
+console.log(test2.toUTCString());
+console.log(test2.getTime());
+*/
+
+
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
+var port = process.env.PORT || 3000;
+var listener = app.listen(port, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
+
